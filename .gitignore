@@ -1,0 +1,8 @@
+.env
+data/
+uploads/
+.venv/
+__pycache__/
+tests/__pycache__/
+*.pyc
+import-*.json
