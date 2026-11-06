@@ -67,4 +67,4 @@ python reset.py
 python seed.py
 ```
 
-La base se guarda en `data/`, las evidencias en `uploads/` y no se debe subir `.env`.
+La base se guarda en `data/`, las evidencias en `uploads/`.
