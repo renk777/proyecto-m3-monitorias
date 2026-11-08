@@ -1,0 +1,7 @@
+Flask==3.1.0
+PyJWT==2.10.1
+openpyxl==3.1.5
+python-dotenv==1.0.1
+tzdata==2025.2
+pytest==8.3.4
+pyflakes>=3.2

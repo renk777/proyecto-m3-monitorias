@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistema de monitorías académicas de la Universidad Cooperativa de Colombia: reservas, asistencia y acompañamiento de estudiantes.">
+  <title>Monitorías académicas | UCC</title>
+  <link rel="icon" href="/logo_ucc.png">
+  <link rel="stylesheet" href="/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div id="app"><noscript>Esta aplicación necesita JavaScript para funcionar.</noscript></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <!-- Orden de carga: núcleo -> componentes -> vistas -> arranque -->
+  <script src="/js/core.js"></script>
+  <script src="/js/ui.js"></script>
+  <script src="/js/views-common.js"></script>
+  <script src="/js/views-student.js"></script>
+  <script src="/js/views-monitor.js"></script>
+  <script src="/js/views-teacher.js"></script>
+  <script src="/js/views-risk.js"></script>
+  <script src="/js/views-admin.js"></script>
+  <script src="/js/main.js"></script>
+</body>
+</html>
