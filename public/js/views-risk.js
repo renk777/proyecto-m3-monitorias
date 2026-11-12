@@ -3,6 +3,61 @@
 
 const IMPORT_FIELDS = { document: 'Documento', name: 'Nombre', email: 'Correo', phone: 'Teléfono', program: 'Programa', semester: 'Semestre', course: 'Curso', caseType: 'Tipo de caso', difficulty: 'Dificultad' };
 
+const riskStudentPicker = () => `
+  <div class="student-picker" data-student-picker>
+    <label>Buscar estudiante<input type="search" placeholder="Nombre o documento" autocomplete="off"></label>
+    <label>Estudiante<select name="studentId" required><option value="">Selecciona un estudiante</option></select></label>
+    <p class="hint" data-student-status role="status"></p>
+    <nav class="pager" aria-label="Páginas de estudiantes"></nav>
+  </div>`;
+
+function mountRiskStudentPicker(picker) {
+  if (!picker) return;
+  const search = picker.querySelector('input');
+  const select = picker.querySelector('select');
+  const status = picker.querySelector('[data-student-status]');
+  const pager = picker.querySelector('nav');
+  const size = 20;
+  let requestId = 0;
+  let timer;
+
+  async function load(page, id) {
+    status.textContent = 'Buscando estudiantes…';
+    pager.innerHTML = '';
+    try {
+      const params = new URLSearchParams({ page, limit: size, q: search.value.trim() });
+      const result = await api('/api/risk/students?' + params);
+      if (id !== requestId || !picker.isConnected) return;
+      const selected = select.selectedOptions[0];
+      const options = result.rows.map(s => [s.id, `${s.name} · ${s.document}`]);
+      if (selected?.value && !result.rows.some(s => String(s.id) === selected.value)) {
+        options.unshift([selected.value, selected.textContent]);
+      }
+      select.innerHTML = '<option value="">Selecciona un estudiante</option>' + optionsHtml(options, selected?.value);
+      status.textContent = result.total ? '' : 'No se encontraron estudiantes.';
+      pager.innerHTML = pagerHtml({ ...result, size }, 'data-student-page');
+    } catch (error) {
+      if (id !== requestId || !picker.isConnected) return;
+      status.textContent = error.message;
+      pager.innerHTML = `<button type="button" class="secondary small-btn" data-student-page="${page}">Reintentar</button>`;
+    }
+  }
+
+  search.addEventListener('input', () => {
+    clearTimeout(timer);
+    const id = ++requestId;
+    pager.innerHTML = '';
+    timer = setTimeout(() => {
+      if (picker.isConnected) load(1, id);
+    }, 250);
+  });
+  pager.addEventListener('click', event => {
+    const button = event.target.closest('[data-student-page]');
+    if (button) load(Number(button.dataset.studentPage), ++requestId);
+  });
+  load(1, ++requestId);
+}
+
 /** Listado con búsqueda, filtros y paginación ejecutados en el servidor (puede haber miles de registros). */
 function riskView() {
   const coordinator = state.user.role === 'coordinator', r = state.risk;
@@ -14,15 +69,20 @@ function riskView() {
     panel(`${toolbar}<div id="riskBody"></div><nav class="pager" id="riskPager" aria-label="Paginación"></nav>`, panelHead('Estudiantes en riesgo', action)) + note);
 }
 /** Consulta la página actual al servidor y redibuja solo la tabla y el paginador. */
+let riskRequestId = 0;
 async function loadRisk() {
+  const body = document.getElementById('riskBody');
+  if (!body) return;
+  const requestId = ++riskRequestId;
   const r = state.risk, coordinator = state.user.role === 'coordinator';
   const result = await api('/api/risk/students?' + new URLSearchParams({ page: r.page, limit: 10, q: r.q, program: r.program, assigned: r.assigned }));
+  if (!body.isConnected || requestId !== riskRequestId) return;
   const select = document.getElementById('riskProgram');
   if (select && select.options.length === 1) select.insertAdjacentHTML('beforeend', optionsHtml(result.programs.map(p => [p, p]), r.program));
   r.page = result.page;
   const head = [...(coordinator ? ['<span class="sr-only">Seleccionar</span>'] : []), 'ESTUDIANTE', 'TIPO', 'PROGRAMA', 'CURSO', 'DIFICULTAD', 'MONITOR'];
   const rows = result.rows.map(s => `<tr>${coordinator ? `<td><input type="checkbox" class="risk-check" value="${s.id}" aria-label="Seleccionar a ${esc(s.name)}" ${r.selected?.has(String(s.id)) ? 'checked' : ''}></td>` : ''}<td>${esc(s.name)}<small>${esc(s.email)} · ${esc(s.phone)}</small></td><td>${esc(s.case_type)}</td><td>${esc(s.program)}</td><td>${esc(s.course)}</td><td>${esc(s.difficulty)}</td><td>${s.monitor ? esc(s.monitor) : '<span class="tag orange">Sin asignar</span>'}</td></tr>`).join('');
-  document.getElementById('riskBody').innerHTML = result.rows.length ? tableHtml(head, rows) : emptyState('No hay estudiantes que coincidan con la búsqueda.');
+  body.innerHTML = result.rows.length ? tableHtml(head, rows) : emptyState('No hay estudiantes que coincidan con la búsqueda.');
   document.getElementById('riskCount').textContent = `${result.total} ${result.total === 1 ? 'estudiante' : 'estudiantes'}`;
   document.getElementById('riskPager').innerHTML = pagerHtml({ page: result.page, pages: result.pages, total: result.total, size: 10 }, 'data-risk-page');
 }
@@ -41,9 +101,9 @@ function renderImportPreview(result, fileName) {
 
 /* ---------- Encuestas de ausentismo ---------- */
 async function surveysView() {
-  const [summary, catalogs, students, rows] = await Promise.all([api('/api/surveys/summary'), api('/api/risk/catalogs'), api('/api/risk/students?limit=200'), api('/api/surveys')]);
+  const [summary, catalogs, rows] = await Promise.all([api('/api/surveys/summary'), api('/api/risk/catalogs'), api('/api/surveys')]);
   const form = formPanel('surveyForm',
-    `<label>Estudiante<select name="studentId" required>${optionsHtml(students.rows.map(s => [s.id, `${s.name} · ${s.document}`]))}</select></label>
+    `${riskStudentPicker()}
      <label>Motivo<select name="reason" required>${optionsHtml(catalogs.reasons.map(x => [x, x]))}</select></label>
      <label>¿Regresó?<select name="returned" required>${optionsHtml([['yes', 'Sí'], ['no', 'No']])}</select></label>
      <label>Notas<textarea name="notes" maxlength="500"></textarea></label>`, 'Guardar encuesta');

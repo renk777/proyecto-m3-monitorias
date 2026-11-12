@@ -33,9 +33,16 @@ async function bookingsView() {
 function ratingModal(bookingId) {
   return openModal({
     title: 'Califica tu sesión', submitText: 'Enviar calificación',
-    body: '<div class="stars" role="group" aria-label="Calificación de 1 a 5">' + [1, 2, 3, 4, 5].map(n => `<button type="button" data-score="${n}" aria-label="${n} de 5">★</button>`).join('') + '</div><input type="hidden" name="score"><label>Comentario (opcional)<textarea name="comment" maxlength="500"></textarea></label>',
-    onSubmit: async data => {
-      if (!data.score) throw new Error('Selecciona de 1 a 5 estrellas.');
+    body: '<fieldset><legend>Calificación <b class="required-mark" aria-hidden="true">*</b><span class="sr-only"> (obligatoria)</span></legend><div class="stars">' +
+      [1, 2, 3, 4, 5].map(n => `<button type="button" data-score="${n}" aria-label="${n} de 5 estrellas" aria-pressed="false">★</button>`).join('') +
+      '</div><small class="field-error" data-score-error role="alert"></small></fieldset><input type="hidden" name="score"><label>Comentario (opcional)<textarea name="comment" maxlength="500"></textarea></label>',
+    onSubmit: async (data, form) => {
+      if (!data.score) {
+        const message = 'Selecciona de 1 a 5 estrellas.';
+        form.querySelector('[data-score-error]').textContent = message;
+        form.querySelector('[data-score]').focus();
+        throw new Error(message);
+      }
       await post('/api/ratings', { bookingId, score: Number(data.score), comment: data.comment });
       toast('Calificación guardada. ¡Gracias!', 'success');
     }

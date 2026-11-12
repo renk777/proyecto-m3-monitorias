@@ -23,6 +23,7 @@ async function render({ keepScroll = false } = {}) {
     shell(content);
     markRequired(app);
     mountCollections();
+    mountRiskStudentPicker(app.querySelector('[data-student-picker]'));
     if (state.view === 'risk') await loadRisk();
     window.scrollTo(0, scroll);
   } catch (error) { toast(error.message, 'error'); }
@@ -139,7 +140,11 @@ document.addEventListener('click', async event => {
   if (star) {
     const form = star.closest('form');
     form.elements.score.value = star.dataset.score;
-    form.querySelectorAll('[data-score]').forEach(s => s.classList.toggle('selected', Number(s.dataset.score) <= Number(star.dataset.score)));
+    form.querySelectorAll('[data-score]').forEach(s => {
+      s.classList.toggle('selected', Number(s.dataset.score) <= Number(star.dataset.score));
+      s.setAttribute('aria-pressed', String(s === star));
+    });
+    form.querySelector('[data-score-error]').textContent = '';
     return;
   }
   const view = target.closest('[data-view]');
@@ -177,7 +182,15 @@ document.addEventListener('input', event => {
   const t = event.target;
   clearFieldError(t);
   if (t.matches('[data-coll-q]')) { const c = collections[t.closest('[data-collection]').dataset.collection]; c.q = t.value; c.page = 1; refreshCollection(t.closest('[data-collection]').dataset.collection); }
-  if (t.id === 'riskSearch') { clearTimeout(riskTimer); riskTimer = setTimeout(() => { state.risk.q = t.value.trim(); state.risk.page = 1; loadRisk().catch(e => toast(e.message, 'error')); }, 300); }
+  if (t.id === 'riskSearch') {
+    clearTimeout(riskTimer);
+    riskTimer = setTimeout(() => {
+      if (!t.isConnected) return;
+      state.risk.q = t.value.trim();
+      state.risk.page = 1;
+      loadRisk().catch(e => toast(e.message, 'error'));
+    }, 300);
+  }
 });
 
 document.addEventListener('change', async event => {
@@ -187,13 +200,24 @@ document.addEventListener('change', async event => {
     if (t.matches('[data-coll-filter]')) { const id = t.closest('[data-collection]').dataset.collection; collections[id].filters[t.dataset.collFilter] = t.value; collections[id].page = 1; refreshCollection(id); }
     else if (t.id === 'riskProgram' || t.id === 'riskAssigned') { state.risk[t.id === 'riskProgram' ? 'program' : 'assigned'] = t.value; state.risk.page = 1; await loadRisk(); }
     else if (t.matches('.risk-check')) state.risk.selected[t.checked ? 'add' : 'delete'](t.value);
+    else if (t.matches('.alert-pick')) {
+      t.closest('.alert-row').querySelectorAll('select, input:not([type="hidden"]):not([type="checkbox"])').forEach(field => {
+        field.disabled = !t.checked;
+        if (field.disabled) clearFieldError(field);
+      });
+    }
     else if (t.id === 'periodFilter') { state.periodId = t.value; await render({ keepScroll: true }); }
     else if (t.matches('[data-export-filter]')) {
       const params = new URLSearchParams({ monitorId: document.getElementById('exportMonitor').value, program: document.getElementById('exportProgram').value });
       document.getElementById('exportLink').href = '/api/export/final.zip?' + params;
     } else if (t.id === 'alertSubject') {
-      const students = await api(`/api/teacher/risk-students?subjectId=${t.value}`);
-      document.getElementById('alertSheet').innerHTML = alertRows(students, state.data.alertCatalogs);
+      const sheet = document.getElementById('alertSheet');
+      const subjectId = t.value;
+      sheet.textContent = 'Cargando estudiantes…';
+      const students = await api(`/api/teacher/risk-students?subjectId=${subjectId}`);
+      if (!sheet.isConnected || t.value !== subjectId) return;
+      sheet.innerHTML = alertRows(students, state.data.alertCatalogs);
+      markRequired(sheet);
     }
   } catch (error) { toast(error.message, 'error'); }
 });

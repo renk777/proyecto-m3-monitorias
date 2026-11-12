@@ -46,9 +46,9 @@ async function hoursView() {
 /* ---------- Seguimientos (monitor registra; coordinador consulta y corrige) ---------- */
 async function followupsView() {
   const isMonitor = state.user.role === 'monitor';
-  const [rows, students] = await Promise.all([api('/api/risk/followups'), isMonitor ? api('/api/risk/students?limit=200') : { rows: [] }]);
+  const rows = await api('/api/risk/followups');
   const form = isMonitor ? formPanel('followupForm',
-    `<label>Estudiante<select name="studentId" required>${optionsHtml(students.rows.map(s => [s.id, `${s.name} · ${s.difficulty || s.case_type}`]))}</select></label>
+    `${riskStudentPicker()}
      <label>Medio<select name="medium" required>${optionsHtml(['WhatsApp', 'Correo', 'Videollamada', 'Presencial'].map(x => [x, x]))}</select></label>
      <label>Fecha<input name="appointmentDate" type="date" required></label>
      <label>Trabajo socializado<input name="work" required maxlength="300"></label>
@@ -61,5 +61,5 @@ async function followupsView() {
     filters: [{ key: 'medium', label: 'Medio', get: r => r.medium }, ...(isMonitor ? [] : [{ key: 'monitor', label: 'Monitor', get: r => r.monitor }])],
     renderBody: items => `<div class="list">${items.map(r => `<div class="list-row"><div><b>${esc(r.student)} · ${esc(r.medium)}</b><small>${fmtDate(r.appointment_date)} · Monitor: ${esc(r.monitor)}</small><small>${esc(r.observations)}</small></div><div>${r.evidence_path ? `<a class="link-btn" href="/api/evidence/${r.id}" target="_blank" rel="noopener">Evidencia</a>` : ''}<button type="button" class="secondary small-btn" data-action="editFollowup" data-id="${r.id}" data-medium="${esc(r.medium)}" data-date="${esc(r.appointment_date)}" data-work="${esc(r.work)}" data-commitments="${esc(r.commitments)}" data-observations="${esc(r.observations)}">Editar</button><button type="button" class="secondary small-btn" data-action="deleteFollowup" data-id="${r.id}">Eliminar</button></div></div>`).join('')}</div>`
   });
-  return viewFrame('Seguimientos', 'Registra contactos y evidencias.', `${isMonitor && !students.rows.length ? panel(emptyState('Aún no tienes estudiantes asignados para registrar seguimientos.')) : form}${panel(list)}`);
+  return viewFrame('Seguimientos', 'Registra contactos y evidencias.', `${form}${panel(list)}`);
 }

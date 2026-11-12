@@ -48,7 +48,14 @@ async function analyticsView() {
 /** Filas editables (una por estudiante en riesgo del curso). */
 function alertRows(students, catalogs) {
   if (!students.length) return emptyState('No hay estudiantes en riesgo para este curso.');
-  return `<div class="sheet-head alert-row" aria-hidden="true"><b>Estudiante</b><b>Tipo de alerta</b><b>Calificación</b><b>Acción</b><b>Observaciones</b></div>` + students.map(s => `<div class="alert-row"><input type="hidden" name="studentId" value="${s.id}"><span><label class="alert-pick-label"><input type="checkbox" class="alert-pick"> ${esc(s.name)}</label></span><select name="alertType" aria-label="Tipo de alerta">${optionsHtml(catalogs.alertTypes.map(x => [x, x]))}</select><input name="grade" placeholder="Ej.: 2.5" maxlength="10" aria-label="Calificación"><select name="action" aria-label="Acción">${optionsHtml(catalogs.actions.map(x => [x, x]))}</select><input name="observations" placeholder="Observaciones" maxlength="300" aria-label="Observaciones"></div>`).join('');
+  return students.map(s => `<div class="alert-row">
+    <input type="hidden" name="studentId" value="${s.id}">
+    <label class="alert-pick-label"><input type="checkbox" class="alert-pick"> ${esc(s.name)}</label>
+    <label>Tipo de alerta<select name="alertType" required disabled><option value="">Selecciona un tipo</option>${optionsHtml(catalogs.alertTypes.map(x => [x, x]))}</select></label>
+    <label>Calificación<input name="grade" placeholder="Ej.: 2,5" maxlength="10" disabled></label>
+    <label>Acción<select name="action" required disabled><option value="">Selecciona una acción</option>${optionsHtml(catalogs.actions.map(x => [x, x]))}</select></label>
+    <label>Observaciones<input name="observations" maxlength="300" disabled></label>
+  </div>`).join('');
 }
 async function alertsView() {
   const [subjects, catalogs, history] = await Promise.all([api('/api/teacher/subjects'), api('/api/risk/catalogs'), api('/api/alerts')]);

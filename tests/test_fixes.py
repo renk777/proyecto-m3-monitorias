@@ -283,6 +283,34 @@ def test_risk_students_search_and_filters(env):
     assert c.get("/api/risk/students?limit=2&page=2").get_json()["page"] == 2
 
 
+def test_risk_student_search_reaches_records_after_first_200(env):
+    with sqlite3.connect(env.db_path) as db:
+        monitor_id = db.execute("SELECT id FROM users WHERE email='laura@ucc.edu.co'").fetchone()[0]
+        db.executemany(
+            "INSERT INTO risk_students(period_id,document,name,case_type,monitor_id) VALUES(1,?,?,'x',?)",
+            [(f"D{i:03}", f"Persona {i:03}", monitor_id) for i in range(201)],
+        )
+    monitor = env.login("laura@ucc.edu.co")
+    coordinator = env.login("camila@ucc.edu.co")
+    for client in (monitor, coordinator):
+        first_page = client.get("/api/risk/students?limit=200").get_json()
+        assert first_page["total"] == 201 and first_page["rows"][-1]["document"] == "D199"
+        result = client.get("/api/risk/students?limit=20&q=D200").get_json()
+        assert result["total"] == 1 and result["rows"][0]["document"] == "D200"
+
+
+def test_rejecting_report_requires_observations(env):
+    env.run("INSERT INTO hour_reports(assignment_id,month,hours) VALUES(1,'2026-11',2)")
+    teacher = env.login("andres@ucc.edu.co")
+    url = "/api/reports/1"
+    assert teacher.patch(url, json={"status": "rejected"}).status_code == 400
+    assert teacher.patch(url, json={"status": "rejected", "observations": "  "}).status_code == 400
+    assert teacher.patch(url, json={"status": "rejected", "observations": "x" * 501}).status_code == 400
+    assert env.q("SELECT status FROM hour_reports") == [("pending",)]
+    assert teacher.patch(url, json={"status": "rejected", "observations": "Revisar asistencia."}).status_code == 200
+    assert env.q("SELECT status,observations FROM hour_reports") == [("rejected", "Revisar asistencia.")]
+
+
 # ---------------------------------------------------------------- errores sin Traceback
 def test_errors_are_json_without_traceback(env):
     @env.app.get("/api/boom")

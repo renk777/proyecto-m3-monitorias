@@ -39,7 +39,7 @@ function openModal({ title, body, submitText = 'Guardar', onSubmit, danger = fal
       try { await onSubmit?.(Object.fromEntries(new FormData(form)), form); close(true); }
       catch (error) { toast(error.message, 'error'); button.disabled = false; }
     });
-    (form.querySelector('input:not([type="hidden"]),select,textarea') || form.querySelector('[type="submit"]')).focus();
+    (form.querySelector('input:not([type="hidden"]),select,textarea,[data-score]') || form.querySelector('[type="submit"]')).focus();
   });
 }
 /** Confirmación con modal propio; resuelve true/false. */
@@ -145,7 +145,7 @@ function clearFieldError(field) {
 }
 /** Valida todo el formulario; muestra errores bajo cada campo y un aviso general. */
 function validateForm(form) {
-  form.querySelectorAll('.field-error').forEach(el => el.remove());
+  form.querySelectorAll('.field-error:not([data-score-error])').forEach(el => el.remove());
   let first = null;
   form.querySelectorAll('input,select,textarea').forEach(field => {
     if (field.type === 'hidden' || field.disabled) return;

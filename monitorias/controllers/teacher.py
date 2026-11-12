@@ -30,10 +30,16 @@ def review_report(report_id):
     data = payload()
     if data.get("status") not in ("approved", "rejected"):
         return jsonify(error="El estado no es válido."), 400
+    observations = data.get("observations", "")
+    if not isinstance(observations, str) or len(observations) > 500:
+        return jsonify(error="Las observaciones deben ser un texto de hasta 500 caracteres."), 400
+    observations = observations.strip()
+    if data["status"] == "rejected" and not observations:
+        return jsonify(error="Escribe el motivo del rechazo en Observaciones."), 400
     with conn() as connection:
         changed = connection.execute("""UPDATE hour_reports SET status=?,observations=?,reviewed_by=? WHERE id=?
             AND assignment_id IN (SELECT ma.id FROM monitor_assignments ma JOIN subjects s ON s.id=ma.subject_id WHERE s.teacher_id=?)""",
-            (data["status"], str(data.get("observations", "")), request.user["id"], report_id, request.user["id"]))
+            (data["status"], observations, request.user["id"], report_id, request.user["id"]))
         if changed.rowcount != 1:
             return jsonify(error="Reporte no encontrado."), 404
         info = connection.execute("""SELECT ma.monitor_id,s.name subject,h.month FROM hour_reports h

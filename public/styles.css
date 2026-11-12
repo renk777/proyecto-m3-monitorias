@@ -39,6 +39,11 @@
 .inline-form label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:#53657a;font-weight:600;min-width:130px}
 .inline-form input,.inline-form select{border:1px solid #cbd9e5;border-radius:6px;padding:9px;background:#fff;color:var(--ink)}
 .inline-form .primary{height:39px}
+.student-picker{display:grid;gap:8px;flex-basis:100%;max-width:520px;min-width:0}
+.student-picker select{width:100%;min-width:0}
+.student-picker .hint{margin:0}
+.student-picker .hint:empty,.student-picker .pager:empty{display:none}
+.student-picker .pager{padding:4px 0;border:0}
 .attendance-actions{min-width:205px}
 .chart-panel{padding:22px}
 .chart-panel h2{font-size:17px;color:var(--navy);margin:0 0 20px}
@@ -69,6 +74,8 @@ svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 .calendar-block b,.calendar-block small{display:block}.calendar-block small{color:var(--muted);margin:4px 0}
 .alert-row{display:grid;grid-template-columns:1.2fr 1.3fr .8fr 1.4fr 1.3fr;gap:8px;align-items:center;padding:8px;border-bottom:1px solid var(--line);font-size:12px}
 .alert-row input,.alert-row select{min-width:0;border:1px solid #cbd9e5;border-radius:5px;padding:8px}
+.alert-row label:not(.alert-pick-label){display:grid;gap:4px;min-width:0}
+.alert-row input:disabled,.alert-row select:disabled{background:#f3f6fa;color:#53657a}
 @media(max-width:850px){.calendar-grid{grid-template-columns:1fr 1fr}.alert-row{grid-template-columns:1fr 1fr}}
 @media(max-width:520px){.calendar-grid{grid-template-columns:1fr}.alert-row{grid-template-columns:1fr}}
 .modal-backdrop{position:fixed;inset:0;background:#102a3b80;display:grid;place-items:center;z-index:10;padding:20px}
@@ -77,6 +84,8 @@ svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:1.8;stroke
 .rating-modal textarea{min-height:90px;border:1px solid #cbd9e5;border-radius:6px;padding:10px;resize:vertical}
 .modal-close{position:absolute;right:12px;top:8px;background:transparent;font-size:24px;color:var(--muted)}
 .stars{display:flex;gap:8px}.stars button{background:transparent;color:#cbd9e5;font-size:29px;padding:0}.stars button.selected{color:#d4a500}
+.rating-modal legend{font-size:14px;font-weight:600}
+.rating-modal [data-score-error]:empty{display:none}
 
 .alert-pick-label{display:flex;gap:8px;align-items:center;cursor:pointer}
 .alert-row input.alert-pick{width:auto;padding:0;min-width:0}

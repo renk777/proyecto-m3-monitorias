@@ -157,11 +157,11 @@ Contraseña de todos: `Demo1234!`
 | Criterio | Cómo se cumple |
 |---|---|
 | Backend Flask, MVC, rutas, controladores | Fábrica de aplicación, 7 blueprints, capa de modelo y servicios separados |
-| CRUD completo | Usuarios, asignaturas, periodos, catálogos, disponibilidad, seguimientos, alertas, encuestas y asignaciones |
+| CRUD completo | Las asignaturas, los bloques de disponibilidad y los seguimientos se pueden crear, consultar, editar y eliminar. Los usuarios y catálogos se pueden desactivar. Las alertas y encuestas se pueden crear, consultar y eliminar. |
 | Validaciones y errores | Cliente (JS, mensajes bajo cada campo) y servidor (Python); errores en JSON amigable, **nunca un Traceback** |
 | Feedback visual | Toasts de éxito/error y modales de confirmación propios (sin `alert()` ni `confirm()`) |
 | Campos obligatorios | Todos los formularios marcan con **\*** los campos obligatorios y explican la leyenda |
-| Paginación y filtros | Listados con búsqueda dinámica, filtros y paginación; estudiantes en riesgo paginados desde el servidor |
+| Paginación y filtros | Listados con búsqueda dinámica, filtros y paginación. La consulta de estudiantes en riesgo y los selectores de Encuestas y Seguimientos buscan y paginan desde el servidor. |
 | Base de datos relacional | SQLite con PK, FK, `UNIQUE` y `CHECK`; persistencia inmediata |
 | Renderizado dinámico | Toda la información se obtiene por Fetch desde `/api/...`; el HTML no contiene datos estáticos |
 | Diseño y UX | Paleta institucional, responsive, navegación por rol, animaciones suaves (`prefers-reduced-motion`) |
@@ -173,5 +173,12 @@ Contraseña de todos: `Demo1234!`
 python -m pyflakes monitorias app.py seed.py reset.py
 python -m pytest
 ```
+
+### Verificación en el navegador
+
+1. Como administrador, crea una asignatura de prueba, edita su nombre y comprueba que la lista se actualiza tras guardar. Vuelve a entrar para verificar el nombre guardado. Elimina la asignatura antes de vincularle un monitor.
+2. Como estudiante, reserva una sesión con cupos disponibles. Comprueba que el cupo disminuye y que la reserva aparece en **Mis reservas**. Como monitor, marca la asistencia y cierra la sesión. Como profesor, verifica las horas generadas en el reporte mensual.
+3. En **Reportes de horas**, intenta rechazar un reporte con las observaciones vacías y comprueba el aviso. En **Alertas tempranas**, marca un estudiante y verifica los campos **Tipo de alerta** y **Acción**.
+4. En **Estudiantes en riesgo**, navega entre páginas y combina una búsqueda con un filtro. En **Encuestas** y **Seguimientos**, busca por documento un estudiante situado fuera de la primera página y guarda el formulario.
 
 Para reiniciar los datos: detén el servidor y ejecuta `python reset.py` y luego `python seed.py`. La base queda en `data/`, las evidencias en `uploads/`; **no subas `.env`** al repositorio.

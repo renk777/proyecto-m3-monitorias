@@ -54,7 +54,7 @@ def risk_students():
             where += " AND r.monitor_id IS NOT NULL"
         total = connection.execute(f"SELECT COUNT(*) n FROM risk_students r {where}", args).fetchone()["n"]
         rows = connection.execute(f"""SELECT r.*,u.name monitor FROM risk_students r LEFT JOIN users u ON u.id=r.monitor_id
-            {where} ORDER BY r.monitor_id IS NOT NULL,r.name LIMIT ? OFFSET ?""", args + [limit, (page - 1) * limit]).fetchall()
+            {where} ORDER BY r.monitor_id IS NOT NULL,r.name,r.id LIMIT ? OFFSET ?""", args + [limit, (page - 1) * limit]).fetchall()
     return jsonify(rows=[row_dict(x) for x in rows], page=page, pages=max(1, (total + limit - 1) // limit), total=total, programs=programs)
 
 
@@ -183,13 +183,16 @@ def evidence(followup_id):
 @require_auth("coordinator")
 def create_survey():
     data = payload()
+    returned = data.get("returned")
+    if returned not in ("yes", "no", "1", "0", 1, 0):
+        return jsonify(error="Indica si el estudiante regresó."), 400
     with conn() as connection:
         if data.get("reason") not in set(active_catalog(connection, "survey_reason")):
             return jsonify(error="El motivo no es válido."), 400
         if not connection.execute("SELECT 1 FROM risk_students WHERE id=?", (to_int(data.get("studentId")),)).fetchone():
             return jsonify(error="El estudiante no es válido."), 400
         result = connection.execute("""INSERT INTO surveys(risk_student_id,reason,returned,notes,created_by)
-            VALUES(?,?,?,?,?)""", (to_int(data.get("studentId")), data["reason"], 1 if data.get("returned") in ("yes", "1", 1, True) else 0, data.get("notes", ""), request.user["id"]))
+            VALUES(?,?,?,?,?)""", (to_int(data.get("studentId")), data["reason"], int(returned in ("yes", "1", 1)), data.get("notes", ""), request.user["id"]))
     return jsonify(id=result.lastrowid), 201
 
 
