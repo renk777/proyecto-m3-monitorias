@@ -181,4 +181,4 @@ python -m pytest
 3. En **Reportes de horas**, intenta rechazar un reporte con las observaciones vacías y comprueba el aviso. En **Alertas tempranas**, marca un estudiante y verifica los campos **Tipo de alerta** y **Acción**.
 4. En **Estudiantes en riesgo**, navega entre páginas y combina una búsqueda con un filtro. En **Encuestas** y **Seguimientos**, busca por documento un estudiante situado fuera de la primera página y guarda el formulario.
 
-Para reiniciar los datos: detén el servidor y ejecuta `python reset.py` y luego `python seed.py`. La base queda en `data/`, las evidencias en `uploads/`; **no subas `.env`** al repositorio.
+Para reiniciar los datos: detén el servidor y ejecuta `python reset.py` y luego `python seed.py`. La base queda en `data/`, las evidencias en `uploads/`.
