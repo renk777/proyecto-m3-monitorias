@@ -1,6 +1,6 @@
 # Sistema de Monitorías Académicas · UCC
 
-**[Abrir demo en Railway](https://monitorias-ucc-demo.up.railway.app/)**
+**[Abrir Monitorías UCC](https://monitorias-ucc.up.railway.app/)**
 
 Aplicación web **Full Stack** para gestionar monitorías académicas: oferta y reserva de sesiones, control de asistencia, horas de los monitores y acompañamiento de estudiantes en riesgo (alertas tempranas, seguimientos, encuestas e importación de reportes DARP).
 
