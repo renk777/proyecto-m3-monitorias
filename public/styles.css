@@ -173,3 +173,49 @@ input,select,textarea{max-width:100%;min-width:0}
   .filter,.filter select{width:100%;max-width:100%}
   .bar-chart{overflow-x:auto}
 }
+
+/* Identidad visual y movimiento: transiciones breves, sin distracciones. */
+:root{--navy:#12364a;--ink:#203c4b;--muted:#607787;--line:#dce8ed;--bg:#f3f8fa;--blue:#087f93}
+body{background:var(--bg)}
+.sidebar{background:linear-gradient(165deg,#123e52 0%,#102c3e 100%);box-shadow:4px 0 24px #1034480a}
+.brand{border-bottom-color:#ffffff1c}.brand strong{color:#fff;letter-spacing:-.2px}.brand img{padding:3px}
+.nav button{transition:background .18s ease,color .18s ease,box-shadow .18s ease}
+.nav button.active{background:linear-gradient(110deg,#087f93,#0a697e);box-shadow:0 4px 12px #071c3026;color:#fff}
+.nav button:hover{background-color:#ffffff18}.nav button.active:hover{filter:brightness(1.08)}
+.topbar{background:#ffffffed;border-bottom-color:#e3edf1;box-shadow:0 3px 16px #163e5003}
+.avatar{background:linear-gradient(135deg,#d9f2f1,#e6f0fb);border:1px solid #c5e4e9;color:#15546b}
+.content{width:100%}.hero{padding-bottom:18px;border-bottom:1px solid #dce8ed;margin-bottom:24px}
+.hero h1{font-weight:750;letter-spacing:-.7px;line-height:1.2}.hero p{line-height:1.65;max-width:70ch}
+.panel,.form-panel,.chart-panel,.stat,.session-card{border-color:#dce8ed;border-radius:14px;box-shadow:0 5px 20px #12364a05}
+.panel-head{background:linear-gradient(105deg,#fff,#f5fafb)}
+.stat{position:relative;overflow:hidden;border-top:3px solid #158e9e}
+.stat:nth-child(2){border-top-color:#70a936}.stat:nth-child(3){border-top-color:#6586bc}
+.stat b{font-size:30px;letter-spacing:-1px}.stat i{background:#e9f6f7;border-radius:12px;color:#087f93}
+.stat:nth-child(2) i{background:#eff6e7;color:#527d26}.stat:nth-child(3) i{background:#edf1fa;color:#506b99}
+.primary{background:linear-gradient(115deg,#087f93,#076d82);box-shadow:0 4px 12px #087f9320}
+.primary,.secondary,.danger,.sheet-btn{transition:transform .18s ease,box-shadow .18s ease,background .18s ease;border-radius:9px;min-height:40px}
+.primary:hover{background:linear-gradient(115deg,#076f81,#075d70);box-shadow:0 6px 16px #087f932a}
+button:active:not(:disabled){transform:translateY(1px)}
+button:disabled{cursor:not-allowed}
+input,select,textarea{transition:border-color .18s ease,box-shadow .18s ease,background .18s ease}
+.table-wrap,.sheet-wrap{scrollbar-width:thin;scrollbar-color:#b9d5df transparent}
+th{background:#f1f7f9;color:#496878}tbody tr{transition:background .16s ease}tbody tr:hover{background:#f1f9fb}
+.toolbar{background:#f8fbfc}.tag{letter-spacing:.1px}.toast{border:1px solid #ffffff26;box-shadow:0 10px 35px #102a3b25;border-radius:12px}
+.login-page{background:radial-gradient(ellipse at 10% 10%,#cceeee88,transparent 48%),radial-gradient(ellipse at 90% 85%,#e2edc488,transparent 45%),#f3f8fa;position:relative}
+.login-card{border:1px solid #dbe9ed;border-top:4px solid #0b8596;border-radius:20px;box-shadow:0 20px 65px #183c5010;padding:36px}
+.login-card>img{width:86px;height:86px;margin-bottom:20px}.login-card h1{font-weight:750;letter-spacing:-.7px;font-size:28px}
+.login-card input{background:#f9fcfd;min-height:46px;border-color:#ccdfe6;border-radius:9px}
+.login-card .primary{min-height:46px}.login-card small{padding:10px 12px;background:#eef6f8;border-radius:8px;color:#466371}
+.site-footer{background:#fff;border-top:1px solid #dce8ed;color:#607787}.site-footer>span{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#376171}.site-footer li{padding:3px 0}
+@keyframes content-enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes dialog-enter{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.content{animation:content-enter .28s ease-out both}
+.stats .stat{animation:content-enter .35s ease-out both}.stats .stat:nth-child(2){animation-delay:.045s}.stats .stat:nth-child(3){animation-delay:.09s}
+.rating-modal{animation:dialog-enter .2s ease-out both;border-radius:16px;box-shadow:0 24px 80px #071b3533}
+@media(hover:hover) and (prefers-reduced-motion:no-preference){
+ .stat,.session-card{transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease}
+ .stat:hover,.session-card:hover{transform:translateY(-3px);box-shadow:0 10px 26px #12364a10;border-color:#a5ced8}
+ .primary:hover,.secondary:hover{transform:translateY(-1px)}
+}
+@media(max-width:600px){.login-card{padding:26px 22px}.login-card h1{font-size:25px}.hero h1{font-size:23px}.hero{padding-bottom:14px}.stat b{font-size:28px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
