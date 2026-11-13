@@ -182,3 +182,19 @@ python -m pytest
 4. En **Estudiantes en riesgo**, navega entre páginas y combina una búsqueda con un filtro. En **Encuestas** y **Seguimientos**, busca por documento un estudiante situado fuera de la primera página y guarda el formulario.
 
 Para reiniciar los datos: detén el servidor y ejecuta `python reset.py` y luego `python seed.py`. La base queda en `data/`, las evidencias en `uploads/`.
+
+## Demo en Railway
+
+El repositorio incluye Dockerfile y railway.toml. El contenedor activa
+DEMO_MODE=true y COOKIE_SECURE=true, carga los datos de ejemplo solo cuando la
+base está vacía y sirve la aplicación con Gunicorn en el puerto de Railway.
+Las cuentas de la tabla anterior permiten probar los cinco roles.
+
+Si JWT_SECRET no está configurada, el arranque demo genera una clave aleatoria:
+las sesiones se invalidan al reiniciar. Para conservar sesiones entre reinicios,
+configura una clave aleatoria de al menos 32 caracteres como variable de Railway.
+
+Sin volumen, los cambios de la demo y las evidencias son temporales y se pierden
+al reemplazar el contenedor. Para conservarlos, monta un volumen en /app/storage
+y configura DATA_DIR=/app/storage/data y UPLOADS_DIR=/app/storage/uploads.
+Esta demo usa datos ficticios y cuentas compartidas; no ingreses datos personales reales.
