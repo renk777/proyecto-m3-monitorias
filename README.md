@@ -187,7 +187,7 @@ Para reiniciar los datos: detén el servidor y ejecuta `python reset.py` y luego
 
 ## Demo en Railway
 
-El repositorio incluye Dockerfile y railway.toml. El contenedor activa
+El repositorio incluye un Dockerfile. En Railway, configura el chequeo de salud en /api/config. El contenedor activa
 DEMO_MODE=true y COOKIE_SECURE=true, carga los datos de ejemplo solo cuando la
 base está vacía y sirve la aplicación con Gunicorn en el puerto de Railway.
 Las cuentas de la tabla anterior permiten probar los cinco roles.
